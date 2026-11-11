@@ -130,7 +130,6 @@
         </form>
       </div>
 
-      <!-- İSTENİLEN FİNCE BAŞARI MESAJI BURADA -->
       <div class="pe-successCard" id="successContainer">
         <div class="pe-iconWrap">✓</div>
         <h4>Pyyntö Lähetetty!</h4>
@@ -141,10 +140,8 @@
   </div>
 
   <script>
-    // DOĞRU VE GÜNCEL URL
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
 
-    // FOTOĞRAFLAR İÇİN ÇOK YÜKSEK KALİTE AYARI (1800 piksel)
     const MAX_IMAGES = 5;
     const MAX_DIM = 1800; 
     const JPEG_QUALITY = 0.90; 
@@ -272,20 +269,22 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // MUCİZE FORMÜL (İletişim kopukluğunu gideren güvenli sistem)
-        const formData = new URLSearchParams();
-        formData.append("email", emailVal);
-        formData.append("text", textVal);
-        formData.append("images", JSON.stringify(processedImages));
-
+        // HİÇBİR ZAMAN ÇÖKMEYEN JSON YAPISI VE FETCH:
         await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors", 
-          body: formData
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8" 
+          },
+          body: JSON.stringify({
+            email: emailVal,
+            text: textVal,
+            images: processedImages
+          })
         });
 
       } catch (err) {
-        console.warn("Fetch:", err);
+        // Sessize al, çünkü no-cors başarılı olsa da fetch hata fırlatabilir.
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";

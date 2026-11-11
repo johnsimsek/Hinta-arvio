@@ -62,7 +62,7 @@
     .pe-ctaTitle { font-weight: 600; font-size: 14px; color: #000; }
     .pe-ctaSub { font-weight: 400; font-size: 12px; color: #666; margin-top: 2px; }
 
-    /* ===== Popup Overlay (Lasimainen tausta kuten pääsivulla) ===== */
+    /* ===== Popup Overlay (Lasimainen tausta) ===== */
     .pe-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -79,7 +79,7 @@
     }
     .pe-overlay[data-open="true"] { opacity: 1; visibility: visible; }
 
-    /* ===== Panel (Kuten pääsivun popup-content) ===== */
+    /* ===== Panel ===== */
     .pe-panel {
       position: relative;
       width: 90%;
@@ -197,7 +197,6 @@
 </head>
 <body>
 
-  <!-- Floating Button (CTA) -->
   <button class="pe-ctaCenter" id="peCta" type="button">
     <span class="pe-iconWrap">💭</span>
     <span class="pe-ctaText">
@@ -206,12 +205,10 @@
     </span>
   </button>
 
-  <!-- Popup Overlay & Panel -->
   <div class="pe-overlay" id="peOverlay" data-open="false">
     <div class="pe-panel">
       <button class="pe-close" id="peClose">&times;</button>
       
-      <!-- Form Container -->
       <div id="formContainer">
         <div class="pe-header">
           <h3>Pyydä Hinta-arvio</h3>
@@ -220,36 +217,31 @@
 
         <form class="pe-body" id="peForm">
           <input type="email" id="peEmail" class="pe-input" placeholder="Sähköpostiosoite *" required />
-          
           <textarea id="peText" class="pe-textarea" placeholder="Kuvaile tatuointia (esim. koko, sijainti, tyyli)... *" required></textarea>
           
           <div class="pe-file-wrapper">
             <span>+ Lisää referenssikuvia (Vapaaehtoinen)</span>
             <input class="pe-file" id="peImages" type="file" accept="image/*" multiple />
           </div>
-          
           <div class="pe-previews" id="pePreviews"></div>
 
           <button type="submit" class="pe-btn" id="peSubmit">Lähetä Pyyntö</button>
         </form>
       </div>
 
-      <!-- Success Container -->
       <div class="pe-successCard" id="successContainer">
         <div class="pe-iconWrap">✓</div>
         <h4>Pyyntö Lähetetty!</h4>
         <p>Kiitos viestistäsi. Olemme lähettäneet sinulle vahvistuksen sähköpostiisi. Palaamme hinta-arvion kanssa mahdollisimman pian!</p>
         <button class="pe-btn" style="margin-top: 25px;" id="peCloseSuccess">Sulje</button>
       </div>
-
     </div>
   </div>
 
   <script>
-    // TÄHÄN GOOGLE APPS SCRIPT URL (Tämä on antamasi URL, mutta muista päivittää koodi Apps Scriptissä!)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBv8-Lpch9_l7gyzTy9EuWMqBq7K7r5ZxqjwBDzEQ7vHOBJTGtUCXGtVwfox7oyyZ8Bg/exec";
 
-    const MAX_IMAGES = 5; // Rajataan 5 kuvaan per pyyntö (estää koon kasvamisen liian suureksi)
+    const MAX_IMAGES = 5;
     const MAX_DIM = 1200;
     const JPEG_QUALITY = 0.70;
 
@@ -268,7 +260,6 @@
     const formContainer = document.getElementById("formContainer");
     const successContainer = document.getElementById("successContainer");
 
-    // Avaa/Sulje logiikka
     cta.addEventListener("click", () => {
       overlay.dataset.open = "true";
       cta.classList.add("pe-hidden");
@@ -289,7 +280,6 @@
     closeBtn.addEventListener("click", closePanel);
     closeSuccessBtn.addEventListener("click", closePanel);
 
-    // Kuvan kompressointi
     function fileToImage(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -333,7 +323,6 @@
         if (!f.type.startsWith("image/")) continue;
         const dataUrl = await compressImage(f);
         
-        // Näytä esikatselu
         const wrap = document.createElement("div");
         wrap.className = "pe-thumb";
         wrap.innerHTML = `<img src="${dataUrl}">`;
@@ -348,12 +337,10 @@
       return results;
     }
 
-    // Näytä esikatselut kun kuvia valitaan
     imgEl.addEventListener("change", async () => {
       if (imgEl.files.length > MAX_IMAGES) {
         alert("Voit ladata enintään " + MAX_IMAGES + " kuvaa.");
       }
-      // Vain esikatselua varten (prosessoidaan uudestaan submitissa säästääksemme muistia)
       previewsEl.innerHTML = "<div style='font-size:12px;'>Ladataan esikatseluita...</div>";
       previewsEl.dataset.show = "true";
       
@@ -372,7 +359,6 @@
       }
     });
 
-    // Lähetys
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -390,8 +376,13 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
+        // --- THIS IS THE FIX --- 
+        // Adding headers: { "Content-Type": "text/plain;charset=utf-8" } prevents CORS errors from Google
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
           body: JSON.stringify({
             email: emailVal,
             text: textVal,
@@ -399,7 +390,12 @@
           })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (parseError) {
+            throw new Error("Google Apps Script deployment error. Please check step 2.");
+        }
         
         if (result.ok) {
           formContainer.style.display = "none";
@@ -409,7 +405,9 @@
         }
       } catch (err) {
         console.error(err);
-        alert("Yhteysvirhe. Yritä uudelleen myöhemmin.");
+        alert(err.message === "Google Apps Script deployment error. Please check step 2." 
+          ? err.message 
+          : "Yhteysvirhe. Yritä uudelleen myöhemmin.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";

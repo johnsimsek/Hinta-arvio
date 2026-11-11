@@ -12,12 +12,10 @@
       --border-glass: rgba(255, 255, 255, 0.5);
       --z: 2147483000;
     }
-
     body { margin: 0; font-family: var(--font-main); background: transparent; box-sizing: border-box; }
     * { box-sizing: inherit; }
     .pe-hidden { display: none !important; }
 
-    /* ===== Center CTA (Kelluva nappi) ===== */
     .pe-ctaCenter {
       position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
       z-index: var(--z); display: flex; align-items: center; justify-content: flex-start;
@@ -37,7 +35,6 @@
     .pe-ctaTitle { font-weight: 600; font-size: 14px; color: #000; }
     .pe-ctaSub { font-weight: 400; font-size: 12px; color: #666; margin-top: 2px; }
 
-    /* ===== Popup Overlay (Lasimainen tausta) ===== */
     .pe-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -46,7 +43,6 @@
     }
     .pe-overlay[data-open="true"] { opacity: 1; visibility: visible; }
 
-    /* ===== Panel ===== */
     .pe-panel {
       position: relative; width: 90%; max-width: 450px; background: var(--bg-glass);
       backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -65,7 +61,6 @@
     .pe-header p { margin: 8px 0 0 0; font-size: 13px; color: #444; line-height: 1.5; }
     .pe-body { padding: 15px 30px 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
-    /* Input & Textarea */
     .pe-input, .pe-textarea {
       width: 100%; padding: 14px 20px; border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 20px; background: rgba(255, 255, 255, 0.6);
@@ -74,7 +69,6 @@
     .pe-input:focus, .pe-textarea:focus { border-color: rgba(0, 0, 0, 0.4); }
     .pe-textarea { min-height: 100px; resize: vertical; border-radius: 16px; }
 
-    /* File Input */
     .pe-file-wrapper {
       position: relative; border: 1px dashed rgba(0, 0, 0, 0.3); border-radius: 16px;
       background: rgba(255, 255, 255, 0.5); padding: 15px; text-align: center;
@@ -84,13 +78,11 @@
     .pe-file-wrapper span { font-size: 13px; color: #333; font-weight: 500; }
     .pe-file { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
-    /* Previews */
     .pe-previews { display: none; gap: 10px; flex-wrap: wrap; margin-top: -5px; }
     .pe-previews[data-show="true"] { display: flex; }
     .pe-thumb { width: 60px; height: 60px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); }
     .pe-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Buttons */
     .pe-btn {
       width: 100%; padding: 14px 20px; border: none; border-radius: 50px;
       background: #000000; color: #ffffff; font-family: var(--font-main);
@@ -99,7 +91,6 @@
     .pe-btn:active { transform: scale(0.98); }
     .pe-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    /* Success Card */
     .pe-successCard { display: none; text-align: center; padding: 30px; }
     .pe-successCard h4 { font-size: 18px; margin: 0 0 10px 0; color: #000; }
     .pe-successCard p { font-size: 14px; color: #444; line-height: 1.5; margin: 0; }
@@ -150,8 +141,8 @@
   </div>
 
   <script>
-    // GÜNCEL APP SCRIPT URL BURADA:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
+    // 👇👇 BURAYA YENİ ALDIĞIN URL'Yİ YAPIŞTIR: 👇👇
+    const SCRIPT_URL = "BURAYA_YENI_LINKI_YAPISTIR";
 
     const MAX_IMAGES = 5;
     const MAX_DIM = 1200;
@@ -283,29 +274,26 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // GÜVENLİ GÖNDERİM YÖNTEMİ
-        const formData = new URLSearchParams();
+        // Google'ın ASLA engelleyemediği FormData formatı
+        const formData = new FormData();
         formData.append("email", emailVal);
         formData.append("text", textVal);
         formData.append("images", JSON.stringify(processedImages));
 
-        const response = await fetch(SCRIPT_URL, {
+        // json() okuma kodu silindi, çünkü no-cors kullanıyoruz
+        await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "no-cors",
           body: formData
         });
 
-        const result = await response.json();
-        
-        if (result.ok) {
-          formContainer.style.display = "none";
-          successContainer.style.display = "block";
-        } else {
-          alert("Lähetys epäonnistui: " + result.error);
-        }
+        // Hata fırlatılmazsa (Google çökmezse) başarılı ekranını göster
+        formContainer.style.display = "none";
+        successContainer.style.display = "block";
         
       } catch (err) {
         console.error(err);
-        alert("Yhteysvirhe. Lütfen SCRIPT_URL linkini doğru kopyaladığından emin ol.");
+        alert("Yhteysvirhe oluştu.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";

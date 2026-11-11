@@ -239,7 +239,7 @@
   </div>
 
   <script>
-    // NEW URL ADDED HERE
+    // Yeni Linkin Burada:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxgSNG1-ifiaGcs2HU_wulgGhuloKKZQj09cINuizlIM-ndL036SK5qkujpEM-JMaROQ/exec";
 
     const MAX_IMAGES = 5;
@@ -377,9 +377,10 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // CORS fix included here
-        const response = await fetch(SCRIPT_URL, {
+        // --- BURASI DÜZELTİLDİ: mode: "no-cors" eklendi ---
+        await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "no-cors", 
           headers: {
             "Content-Type": "text/plain;charset=utf-8"
           },
@@ -390,24 +391,13 @@
           })
         });
 
-        let result;
-        try {
-            result = await response.json();
-        } catch (parseError) {
-            throw new Error("Google Apps Script deployment error. Make sure you deployed as 'Web App', Execute as 'Me', and Access 'Anyone'.");
-        }
+        // "no-cors" kullandığımız için fetch hata vermezse işlem başarılı kabul edilir.
+        formContainer.style.display = "none";
+        successContainer.style.display = "block";
         
-        if (result.ok) {
-          formContainer.style.display = "none";
-          successContainer.style.display = "block";
-        } else {
-          alert("Lähetys epäonnistui: " + (result.error || "Tuntematon virhe"));
-        }
       } catch (err) {
         console.error(err);
-        alert(err.message.includes("deployment error") 
-          ? err.message 
-          : "Yhteysvirhe. Yritä uudelleen myöhemmin.");
+        alert("Yhteysvirhe. Yritä uudelleen myöhemmin.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";

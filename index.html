@@ -140,11 +140,12 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
+    // 👇👇 BURAYA ŞİMDİ ALDIĞIN YEPYENİ LİNKİ YAPIŞTIR 👇👇
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_N-pId7a5FpzaYb7Aj2m3Y1L3tY0T3yqtYyHWOi9znSZ2lyQ1-t6eA0TI4b7mnGRK/exec";
 
     const MAX_IMAGES = 5;
-    const MAX_DIM = 1800; 
-    const JPEG_QUALITY = 0.90; 
+    const MAX_DIM = 1400; 
+    const JPEG_QUALITY = 0.85; 
 
     const cta = document.getElementById("peCta");
     const overlay = document.getElementById("peOverlay");
@@ -269,13 +270,10 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // HİÇBİR ZAMAN ÇÖKMEYEN JSON YAPISI VE FETCH:
+        // HİÇBİR ZAMAN HATA VERMEYEN EN SADE FETCH METODU
         await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8" 
-          },
           body: JSON.stringify({
             email: emailVal,
             text: textVal,
@@ -284,7 +282,7 @@
         });
 
       } catch (err) {
-        // Sessize al, çünkü no-cors başarılı olsa da fetch hata fırlatabilir.
+        console.warn("Fetch:", err);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";

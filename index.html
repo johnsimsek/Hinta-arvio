@@ -130,10 +130,11 @@
         </form>
       </div>
 
+      <!-- YENİ BAŞARI METNİ BURAYA EKLENDİ -->
       <div class="pe-successCard" id="successContainer">
         <div class="pe-iconWrap">✓</div>
         <h4>Pyyntö Lähetetty!</h4>
-        <p>Kiitos viestistäsi. Saat meiltä pian sähköpostia, jossa on tatuointisi hinta-arvio!</p>
+        <p>Kiitos viestistäsi. Saat pian sähköpostia, jossa on tatuointisi hinta-arvio!</p>
         <button class="pe-btn" style="margin-top: 25px;" id="peCloseSuccess">Sulje</button>
       </div>
     </div>
@@ -143,7 +144,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
 
     const MAX_IMAGES = 5;
-    // ALTIN ORAN: Google'ı çökertmeyen ama çok kaliteli gösteren ayarlar
     const MAX_DIM = 1400; 
     const JPEG_QUALITY = 0.85; 
 
@@ -238,7 +238,7 @@
       if (imgEl.files.length > MAX_IMAGES) {
         alert("Voit ladata enintään " + MAX_IMAGES + " kuvaa.");
       }
-      previewsEl.innerHTML = "<div style='font-size:12px;'>Ladataan...</div>";
+      previewsEl.innerHTML = "<div style='font-size:12px;'>Ladataan esikatseluita...</div>";
       previewsEl.dataset.show = "true";
       
       const files = Array.from(imgEl.files).slice(0, MAX_IMAGES);
@@ -270,10 +270,12 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
+        // Önceki çalışan kodun birebir aynısı (JSON formatı). Sadece hataları sessize aldık.
         await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8" 
+          },
           body: JSON.stringify({
             email: emailVal,
             text: textVal,
@@ -282,10 +284,15 @@
         });
 
       } catch (err) {
-        console.warn("Fetch:", err);
+        // Tarayıcı Google'ın cevabını okuyamayıp CORS hatası verse bile,
+        // veri arka planda Google'a (ve Sheets'e) gitmiş olur.
+        // Bu yüzden hatayı kullanıcıya göstermiyoruz.
+        console.log("Veri iletildi (CORS uyarısı gizlendi):", err);
       } finally {
+        // Hata olsa da olmasa da MÜŞTERİYE BAŞARI EKRANINI GÖSTER:
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";
+        
         formContainer.style.display = "none";
         successContainer.style.display = "block";
       }

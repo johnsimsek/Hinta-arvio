@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --panelBg1: #f7f7f8;
+      --panelBg2: #eceef1;
+      --panelText: #14161a;
+      --panelMuted: #4c5562;
+      --panelBorder: rgba(0,0,0,.10);
+      --shadow: 0 18px 55px rgba(0,0,0,.20);
+      --radius: 16px;
+
+      --metal1: #f4f5f7;
+      --metal2: #cfd4dc;
+      --metal3: #aeb6c1;
+      --metalStroke: rgba(0,0,0,.35);
+
+      --z: 2147483000;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: transparent;
+    }
+
+    .pe-hidden{ display:none !important; }
+
+    /* ===== Center CTA (fixed in viewport) ===== */
+    .pe-ctaCenter{
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: var(--z);
+
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap: 10px;
+
+      padding: 12px 16px 12px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--metalStroke);
+
+      background:
+        radial-gradient(120% 140% at 20% 10%, rgba(255,255,255,.90) 0%, rgba(255,255,255,0) 45%),
+        linear-gradient(180deg, var(--metal1) 0%, var(--metal2) 48%, var(--metal3) 100%);
+
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.75),
+        inset 0 -6px 10px rgba(0,0,0,.18);
+
+      cursor: pointer;
+      user-select: none;
+      max-width: calc(100vw - 36px);
+    }
+    .pe-ctaCenter:active{ transform: translate(-50%, -50%) scale(.99); }
+
+    .pe-iconWrap{
+      width: 44px; height: 44px;
+      flex: 0 0 44px;
+      border-radius: 999px;
+      display: grid; place-items: center;
+      border: 1px solid rgba(0,0,0,.35);
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #d9dde3 36%, #aab2be 100%);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,.18), 0 4px 14px rgba(0,0,0,.20);
+      font-size: 20px;
+      color:#0f1216;
+      position: relative;
+      overflow: hidden;
+    }
+    .pe-iconWrap::after{
+      content:"";
+      position:absolute; top:-45%; left:-35%;
+      width:120%; height:120%;
+      background: radial-gradient(circle at 40% 40%, rgba(255,255,255,.75), rgba(255,255,255,0) 60%);
+      transform: rotate(18deg);
+      opacity: .75;
+      pointer-events:none;
+    }
+
+    .pe-ctaText{ display:flex; flex-direction:column; line-height:1.1; min-width:0; }
+    .pe-ctaTitle{
+      font-weight: 950;
+      font-size: 14px;
+      color:#0f1216;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .pe-ctaSub{
+      margin-top: 4px;
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(0,0,0,.62);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ===== Panel in document flow ===== */
+    .pe-panel{
+      width: min(520px, calc(100vw - 24px));
+      margin: 24px auto;
+      background: linear-gradient(180deg, var(--panelBg1), var(--panelBg2));
+      color: var(--panelText);
+      border: 1px solid var(--panelBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display:none;
+    }
+    .pe-panel[data-open="true"]{ display:block; }
+
+    .pe-header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 10px;
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid var(--panelBorder);
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(6px);
+    }
+    .pe-title{
+      display:flex; align-items:center; justify-content:flex-start;
+      gap:8px;
+      font-weight: 950;
+      font-size: 14px;
+      min-width:0;
+    }
+    .pe-title span:last-child{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .pe-close{
+      background: rgba(255,255,255,.70);
+      border: 1px solid var(--panelBorder);
+      color: var(--panelText);
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .pe-body{ padding: 12px; display:grid; gap: 10px; }
+
+    .pe-info{
+      font-size: 13px;
+      color: var(--panelMuted);
+      line-height: 1.5;
+      background: rgba(255,255,255,.65);
+      border: 1px solid var(--panelBorder);
+      border-radius: 14px;
+      padding: 10px 10px;
+    }
+
+    .pe-textarea{
+      width:100%;
+      min-height: 92px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid var(--panelBorder);
+      background: rgba(255,255,255,.85);
+      color: var(--panelText);
+      padding: 10px 10px;
+      font-size: 14px;
+    }
+
+    .pe-file{
+      width:100%;
+      border-radius: 14px;
+      border: 1px dashed rgba(0,0,0,.22);
+      background: rgba(255,255,255,.70);
+      padding: 10px;
+      color: var(--panelMuted);
+      font-size: 13px;
+    }
+
+    .pe-previews{
+      display:none;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.55);
+    }
+    .pe-previews[data-show="true"]{ display:flex; }
+    .pe-previewsMeta{
+      width:100%;
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(0,0,0,.62);
+    }
+    .pe-thumb{
+      width:72px; height:72px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.75);
+      overflow:hidden;
+      position:relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+    }
+    .pe-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .pe-thumb span{
+      position:absolute; left:6px; right:6px; bottom:6px;
+      font-size:10px; font-weight:900;
+      color: rgba(0,0,0,.80);
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:999px;
+      padding:2px 6px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .pe-error{
+      font-size: 12px;
+      color: #7a1b1b;
+      background: rgba(255,0,0,.08);
+      border: 1px solid rgba(255,0,0,.18);
+      border-radius: 12px;
+      padding: 8px 10px;
+      display:none;
+    }
+
+    .pe-actions{ display:flex; gap: 10px; justify-content:flex-end; align-items:center; }
+    .pe-btn{
+      border: 1px solid var(--panelBorder);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 13px;
+      background: rgba(255,255,255,.75);
+      color: var(--panelText);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    .pe-btn.primary{
+      background:
+        radial-gradient(120% 140% at 20% 10%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 45%),
+        linear-gradient(180deg, var(--metal1) 0%, var(--metal2) 48%, var(--metal3) 100%);
+      border-color: rgba(0,0,0,.28);
+    }
+    .pe-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+    .pe-priceCard{
+      display:none;
+      margin-top: 6px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.12);
+      background:
+        radial-gradient(120% 140% at 20% 10%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 45%),
+        linear-gradient(180deg, #ffffff 0%, #f0f2f5 100%);
+      box-shadow: 0 10px 28px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    .pe-cardTitle{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(0,0,0,.62);
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .pe-cardPrice{
+      font-size: 34px;
+      font-weight: 1000;
+      letter-spacing: .3px;
+      color: #0f1216;
+      line-height: 1.05;
+    }
+    .pe-cardHint{
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(0,0,0,.55);
+      line-height: 1.35;
+    }
+
+    .pe-spinner{
+      width:14px; height:14px;
+      border-radius:999px;
+      border:2px solid rgba(0,0,0,.22);
+      border-top-color: rgba(0,0,0,.75);
+      display:inline-block;
+      vertical-align:-2px;
+      animation: pe-spin .8s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes pe-spin{ to{ transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  <!-- Center CTA -->
+  <button class="pe-ctaCenter" id="peCta" type="button" aria-label="Open estimator">
+    <span class="pe-iconWrap" aria-hidden="true">💭</span>
+    <span class="pe-ctaText">
+      <span class="pe-ctaTitle">Online tatuoinnin hinta-arvio</span>
+      <span class="pe-ctaSub">Pyydä hinta-arvio</span>
+    </span>
+  </button>
+
+  <!-- Panel -->
+  <section class="pe-panel" id="pePanel" data-open="false" aria-hidden="true">
+    <header class="pe-header">
+      <div class="pe-title">
+        <span aria-hidden="true">💭</span>
+        <span>Online Tattoo Price Estimator</span>
+      </div>
+      <button class="pe-close" id="peClose" aria-label="Close">✕</button>
+    </header>
+
+    <form class="pe-body" id="peForm">
+      <div class="pe-info">
+        Voit halutessasi kertoa ideastasi tai lisätä lisätietoja tatuoinnista.<br/>
+        Voit myös halutessasi ladata referenssikuvia hinnan arviointia varten.<br/>
+        Kerro myös tatuoinnin koko (esim. 10x15 cm) ja mihin kohtaan kehoa se tulee.
+      </div>
+
+      <textarea class="pe-textarea" id="peText" placeholder="Kirjoita tähän… (valinnainen)" maxlength="4000"></textarea>
+      <input class="pe-file" id="peImages" type="file" accept="image/*" multiple />
+      <div class="pe-previews" id="pePreviews" aria-live="polite"></div>
+
+      <div id="peError" class="pe-error"></div>
+
+      <div class="pe-actions">
+        <button type="button" class="pe-btn" id="peReset">Reset</button>
+        <button type="submit" class="pe-btn primary" id="peSubmit">Pyydä hinta-arvio</button>
+      </div>
+
+      <div class="pe-priceCard" id="pePriceCard">
+        <div class="pe-cardTitle">Hinta-arvio</div>
+        <div class="pe-cardPrice" id="peCardPrice">—</div>
+        <div class="pe-cardHint" id="peCardHint">Odotetaan järjestelmän vastausta – yleensä alle tunnin kuluessa.</div>
+        <div class="pe-cardHint" id="peCardDisclaimer">
+          Tämä on suuntaa-antava arvio. Arvio muodostetaan järjestelmämme avulla antamiesi tietojen perusteella, ja tatuoija käy sen läpi. Lopullinen hinta voi vaihdella.
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    const TOKEN_KEY = "tattoo_estimate_token_v1";
+    const LS_PRICE = "tattoo_estimate_price_display_v1";
+    const LS_HINT  = "tattoo_estimate_hint_v1";
+    const LS_DRAFT_TEXT = "tattoo_estimate_draft_text_v1";
+
+    const SS_PREVIEWS = "tattoo_estimate_preview_images_v1";
+    const SS_PREVIEW_NAMES = "tattoo_estimate_preview_names_v1";
+
+    const POLL_INTERVAL_MS = 2000;
+    const POLL_TIMEOUT_MS = 10 * 60 * 1000;
+
+    const MAX_IMAGES = 10;
+    const MAX_DIM = 1400;
+    const JPEG_QUALITY = 0.80;
+
+    const cta = document.getElementById("peCta");
+    const panel = document.getElementById("pePanel");
+    const closeBtn = document.getElementById("peClose");
+    const form = document.getElementById("peForm");
+    const textEl = document.getElementById("peText");
+    const imgEl = document.getElementById("peImages");
+    const previewsEl = document.getElementById("pePreviews");
+    const submitBtn = document.getElementById("peSubmit");
+    const resetBtn = document.getElementById("peReset");
+    const errorEl = document.getElementById("peError");
+
+    const cardEl = document.getElementById("pePriceCard");
+    const cardPriceEl = document.getElementById("peCardPrice");
+    const cardHintEl = document.getElementById("peCardHint");
+
+    let autoTimer = null;
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.style.display = "block";
+    }
+    function clearError() {
+      errorEl.textContent = "";
+      errorEl.style.display = "none";
+    }
+
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      resetBtn.disabled = isLoading;
+      textEl.disabled = isLoading;
+      imgEl.disabled = isLoading;
+
+      if (isLoading) {
+        submitBtn.dataset.prev = submitBtn.textContent;
+        submitBtn.innerHTML = '<span class="pe-spinner"></span>Waiting…';
+      } else {
+        submitBtn.textContent = submitBtn.dataset.prev || "Pyydä hinta-arvio";
+      }
+    }
+
+    function getToken_() {
+      return localStorage.getItem(TOKEN_KEY) || "";
+    }
+    function createNewToken_() {
+      const t = (crypto?.randomUUID?.() || String(Date.now()) + "_" + Math.random().toString(16).slice(2));
+      localStorage.setItem(TOKEN_KEY, t);
+      return t;
+    }
+    function ensureToken_() {
+      const t = getToken_();
+      if (t && t.length > 10) return t;
+      return createNewToken_();
+    }
+
+    function showCard_(priceDisplay, hint) {
+      cardEl.style.display = "block";
+      cardPriceEl.textContent = priceDisplay || "—";
+      cardHintEl.textContent = hint || "";
+    }
+    function saveCardToStorage_(priceDisplay, hint) {
+      localStorage.setItem(LS_PRICE, priceDisplay || "");
+      localStorage.setItem(LS_HINT, hint || "");
+    }
+    function renderCardFromStorage_() {
+      const price = localStorage.getItem(LS_PRICE) || "";
+      const hint  = localStorage.getItem(LS_HINT)  || "";
+      if (!price && !hint) return;
+      showCard_(price || "—", hint || "");
+    }
+    function clearCardStorage_() {
+      localStorage.removeItem(LS_PRICE);
+      localStorage.removeItem(LS_HINT);
+    }
+
+    function saveDraft_() {
+      localStorage.setItem(LS_DRAFT_TEXT, textEl.value || "");
+    }
+    function renderDraft_() {
+      const draft = localStorage.getItem(LS_DRAFT_TEXT);
+      if (draft && !textEl.value) textEl.value = draft;
+    }
+
+    function clearPreviews_() {
+      previewsEl.innerHTML = "";
+      previewsEl.dataset.show = "false";
+      sessionStorage.removeItem(SS_PREVIEWS);
+      sessionStorage.removeItem(SS_PREVIEW_NAMES);
+    }
+
+    function renderPreviewDataUrls_(dataUrls, names) {
+      previewsEl.innerHTML = "";
+      if (!dataUrls || !dataUrls.length) {
+        previewsEl.dataset.show = "false";
+        return;
+      }
+      previewsEl.dataset.show = "true";
+
+      const meta = document.createElement("div");
+      meta.className = "pe-previewsMeta";
+      meta.textContent = `${dataUrls.length} kuva(a) valittu`;
+      previewsEl.appendChild(meta);
+
+      for (let i = 0; i < dataUrls.length; i++) {
+        const wrap = document.createElement("div");
+        wrap.className = "pe-thumb";
+
+        const img = document.createElement("img");
+        img.src = dataUrls[i];
+
+        const label = document.createElement("span");
+        label.textContent = names?.[i] || "image.jpg";
+
+        wrap.appendChild(img);
+        wrap.appendChild(label);
+        previewsEl.appendChild(wrap);
+      }
+    }
+
+    function loadPreviewsFromSession_() {
+      try {
+        const raw = sessionStorage.getItem(SS_PREVIEWS);
+        if (!raw) return;
+        const dataUrls = JSON.parse(raw);
+        const names = JSON.parse(sessionStorage.getItem(SS_PREVIEW_NAMES) || "[]");
+        if (Array.isArray(dataUrls) && dataUrls.length) {
+          renderPreviewDataUrls_(dataUrls, names);
+        }
+      } catch (_) {}
+    }
+
+    function resetUI() {
+      clearError();
+      form.reset();
+      localStorage.removeItem(LS_DRAFT_TEXT);
+      clearPreviews_();
+      renderCardFromStorage_();
+    }
+
+    function callServer(fnName, arg) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler((err) => reject(new Error(err && err.message ? err.message : String(err))))
+          [fnName](arg);
+      });
+    }
+
+    async function refreshFromServer_() {
+      const token = ensureToken_();
+      const s = await callServer("getStatus", token);
+
+      if (s?.display && String(s.display).trim()) {
+        const price = String(s.display).trim();
+        showCard_(price, "");
+        saveCardToStorage_(price, "");
+        return true;
+      }
+
+      const hint = "Odotetaan järjestelmän vastausta – Hinta-arviot toimitetaan yleensä saman päivän aikana. Voit tarkistaa tilanteen myöhemmin.";
+      showCard_(localStorage.getItem(LS_PRICE) || "—", hint);
+      saveCardToStorage_(localStorage.getItem(LS_PRICE) || "", hint);
+      return false;
+    }
+
+    function startAutoRefresh_() {
+      stopAutoRefresh_();
+      autoTimer = setInterval(() => { refreshFromServer_().catch(() => {}); }, POLL_INTERVAL_MS);
+    }
+    function stopAutoRefresh_() {
+      if (autoTimer) clearInterval(autoTimer);
+      autoTimer = null;
+    }
+
+    function openPanel_() {
+      // ✅ hide CTA completely
+      cta.classList.add("pe-hidden");
+
+      panel.dataset.open = "true";
+      panel.setAttribute("aria-hidden", "false");
+
+      renderDraft_();
+      renderCardFromStorage_();
+      loadPreviewsFromSession_();
+      refreshFromServer_().catch(() => {});
+      startAutoRefresh_();
+
+      setTimeout(() => {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(() => { textEl.focus(); }, 250);
+      }, 50);
+    }
+
+    function closePanel_() {
+      panel.dataset.open = "false";
+      panel.setAttribute("aria-hidden", "true");
+      stopAutoRefresh_();
+
+      // ✅ show CTA again
+      cta.classList.remove("pe-hidden");
+      setTimeout(() => {
+        cta.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+    }
+
+    function fileToImage_(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("Image decode failed"));
+          img.src = String(reader.result || "");
+        };
+        reader.onerror = () => reject(new Error("File read failed"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function compressToJpegDataUrl_(file) {
+      const img = await fileToImage_(file);
+      const w = img.naturalWidth || img.width;
+      const h = img.naturalHeight || img.height;
+
+      let nw = w, nh = h;
+      if (Math.max(w, h) > MAX_DIM) {
+        const scale = MAX_DIM / Math.max(w, h);
+        nw = Math.round(w * scale);
+        nh = Math.round(h * scale);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = nw;
+      canvas.height = nh;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, nw, nh);
+      return canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+    }
+
+    async function prepareImages_(fileList) {
+      const files = Array.from(fileList || []).slice(0, MAX_IMAGES);
+      const dataUrls = [];
+      const names = [];
+      for (const f of files) {
+        if (!f.type || !f.type.startsWith("image/")) continue;
+        const dataUrl = await compressToJpegDataUrl_(f);
+        dataUrls.push(dataUrl);
+        names.push((f.name || "image.jpg").replace(/\.[^.]+$/, ".jpg"));
+      }
+      return { dataUrls, names };
+    }
+
+    async function pollForPrice_() {
+      const start = Date.now();
+      while (Date.now() - start < POLL_TIMEOUT_MS) {
+        const ok = await refreshFromServer_();
+        if (ok) return;
+        await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+      }
+    }
+
+    // Events
+    cta.addEventListener("touchstart", openPanel_, { passive: true });
+    cta.addEventListener("click", openPanel_);
+    closeBtn.addEventListener("click", closePanel_);
+
+    resetBtn.addEventListener("click", resetUI);
+    textEl.addEventListener("input", saveDraft_);
+
+    imgEl.addEventListener("change", async () => {
+      clearError();
+      try {
+        const { dataUrls, names } = await prepareImages_(imgEl.files);
+        sessionStorage.setItem(SS_PREVIEWS, JSON.stringify(dataUrls));
+        sessionStorage.setItem(SS_PREVIEW_NAMES, JSON.stringify(names));
+        renderPreviewDataUrls_(dataUrls, names);
+      } catch (err) {
+        showError(err?.message || "Image preview failed");
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError();
+
+      // ✅ NEW REQUEST: new token + clear old price
+      const token = createNewToken_();
+      clearCardStorage_();
+
+      showCard_("—", "Lähetetty ✅ Odotetaan järjestelmän vastausta – yleensä alle tunnin kuluessa.");
+      saveCardToStorage_("", "Lähetetty ✅ Odotetaan järjestelmän vastausta – yleensä alle tunnin kuluessa.");
+
+      setLoading(true);
+
+      try {
+        const imagesPrepared = await prepareImages_(imgEl.files);
+        const images = imagesPrepared.dataUrls.map((dataUrl, i) => ({
+          name: imagesPrepared.names[i],
+          mime: "image/jpeg",
+          dataUrl
+        }));
+
+        const resp = await callServer("submitRequest", {
+          token,
+          text: (textEl.value || "").trim(),
+          images
+        });
+
+        if (!resp?.ok) throw new Error(resp?.error || "Submit failed");
+
+        await pollForPrice_();
+      } catch (err) {
+        showError(err?.message || "NetworkError: HTTP 0");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Boot
+    ensureToken_();
+    renderDraft_();
+    renderCardFromStorage_();
+    loadPreviewsFromSession_();
+  </script>
+</body>
+</html>

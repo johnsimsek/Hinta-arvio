@@ -239,7 +239,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBv8-Lpch9_l7gyzTy9EuWMqBq7K7r5ZxqjwBDzEQ7vHOBJTGtUCXGtVwfox7oyyZ8Bg/exec";
+    // NEW URL ADDED HERE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxgSNG1-ifiaGcs2HU_wulgGhuloKKZQj09cINuizlIM-ndL036SK5qkujpEM-JMaROQ/exec";
 
     const MAX_IMAGES = 5;
     const MAX_DIM = 1200;
@@ -376,8 +377,7 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // --- THIS IS THE FIX --- 
-        // Adding headers: { "Content-Type": "text/plain;charset=utf-8" } prevents CORS errors from Google
+        // CORS fix included here
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           headers: {
@@ -394,7 +394,7 @@
         try {
             result = await response.json();
         } catch (parseError) {
-            throw new Error("Google Apps Script deployment error. Please check step 2.");
+            throw new Error("Google Apps Script deployment error. Make sure you deployed as 'Web App', Execute as 'Me', and Access 'Anyone'.");
         }
         
         if (result.ok) {
@@ -405,7 +405,7 @@
         }
       } catch (err) {
         console.error(err);
-        alert(err.message === "Google Apps Script deployment error. Please check step 2." 
+        alert(err.message.includes("deployment error") 
           ? err.message 
           : "Yhteysvirhe. Yritä uudelleen myöhemmin.");
       } finally {

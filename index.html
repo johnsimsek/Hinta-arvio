@@ -134,18 +134,18 @@
         <div class="pe-iconWrap">✓</div>
         <h4>Pyyntö Lähetetty!</h4>
         <p>Kiitos viestistäsi. Saat pian sähköpostia, jossa on tatuointisi hinta-arvio!</p>
+        <p style="font-size: 11px; color: #888; margin-top: 10px;">Sinut ohjataan etusivulle...</p>
         <button class="pe-btn" style="margin-top: 25px;" id="peCloseSuccess">Sulje</button>
       </div>
     </div>
   </div>
 
   <script>
-    // 👇👇 BURAYA ŞİMDİ ALDIĞIN YEPYENİ LİNKİ YAPIŞTIR 👇👇
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_N-pId7a5FpzaYb7Aj2m3Y1L3tY0T3yqtYyHWOi9znSZ2lyQ1-t6eA0TI4b7mnGRK/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
 
     const MAX_IMAGES = 5;
-    const MAX_DIM = 1400; 
-    const JPEG_QUALITY = 0.85; 
+    const MAX_DIM = 1800; 
+    const JPEG_QUALITY = 0.90; 
 
     const cta = document.getElementById("peCta");
     const overlay = document.getElementById("peOverlay");
@@ -274,6 +274,9 @@
         await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8" 
+          },
           body: JSON.stringify({
             email: emailVal,
             text: textVal,
@@ -288,6 +291,11 @@
         submitBtn.innerText = "Lähetä Pyyntö";
         formContainer.style.display = "none";
         successContainer.style.display = "block";
+        
+        // 10 SANİYE SONRA ANA SAYFAYA YÖNLENDİRME KODU
+        setTimeout(() => {
+          window.location.href = "https://www.inkyvibestattoo.com";
+        }, 10000);
       }
     });
   </script>

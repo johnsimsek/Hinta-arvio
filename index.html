@@ -60,12 +60,17 @@
     .pe-header p { margin: 8px 0 0 0; font-size: 13px; color: #444; line-height: 1.5; }
     .pe-body { padding: 15px 30px 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
+    .pe-input-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
     .pe-input, .pe-textarea {
       width: 100%; padding: 14px 20px; border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 20px; background: rgba(255, 255, 255, 0.6);
       font-family: var(--font-main); font-size: 14px; outline: none; transition: border 0.3s;
     }
     .pe-input:focus, .pe-textarea:focus { border-color: rgba(0, 0, 0, 0.4); }
+    .pe-input.pe-error { border-color: #dc2626; background: rgba(220, 38, 38, 0.05); }
+    .pe-error-msg { font-size: 12px; color: #dc2626; padding-left: 15px; display: none; }
+    .pe-error-msg.pe-show { display: block; }
+
     .pe-textarea { min-height: 100px; resize: vertical; border-radius: 16px; }
 
     .pe-file-wrapper {
@@ -116,9 +121,15 @@
           <p>Kerro ideastasi, toivotusta koosta ja sijainnista. Voit ladata myös referenssikuvia.</p>
         </div>
 
-        <form class="pe-body" id="peForm">
-          <input type="email" id="peEmail" class="pe-input" placeholder="Sähköpostiosoite *" required />
-          <textarea id="peText" class="pe-textarea" placeholder="Kuvaile tatuointia (esim. koko, sijainti, tyyli)... *" required></textarea>
+        <form class="pe-body" id="peForm" novalidate>
+          <div class="pe-input-group">
+            <input type="email" id="peEmail" class="pe-input" placeholder="Sähköpostiosoite *" required />
+            <span class="pe-error-msg" id="peEmailError">Kirjoita kelvollinen sähköpostiosoite (esim. nimi@osoite.fi)</span>
+          </div>
+
+          <div class="pe-input-group">
+            <textarea id="peText" class="pe-textarea" placeholder="Kuvaile tatuointia (esim. koko, sijainti, tyyli)... *" required></textarea>
+          </div>
           
           <div class="pe-file-wrapper">
             <span>+ Lisää referenssikuvia (Valinnainen)</span>
@@ -153,6 +164,7 @@
     const closeSuccessBtn = document.getElementById("peCloseSuccess");
     const form = document.getElementById("peForm");
     const emailEl = document.getElementById("peEmail");
+    const emailError = document.getElementById("peEmailError");
     const textEl = document.getElementById("peText");
     const imgEl = document.getElementById("peImages");
     const previewsEl = document.getElementById("pePreviews");
@@ -174,11 +186,27 @@
         form.reset();
         previewsEl.innerHTML = "";
         previewsEl.dataset.show = "false";
+        emailEl.classList.remove("pe-error");
+        emailError.classList.remove("pe-show");
       }, 400);
     }
     
     closeBtn.addEventListener("click", closePanel);
     closeSuccessBtn.addEventListener("click", closePanel);
+
+    // Email validation helper function
+    function isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    // Clear error message when user starts typing back in email input
+    emailEl.addEventListener("input", () => {
+      if (emailEl.classList.contains("pe-error")) {
+        emailEl.classList.remove("pe-error");
+        emailError.classList.remove("pe-show");
+      }
+    });
 
     function fileToImage(file) {
       return new Promise((resolve, reject) => {
@@ -206,32 +234,6 @@
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, w, h);
       return canvas.toDataURL("image/jpeg", JPEG_QUALITY);
-    }
-
-    async function processFiles(fileList) {
-      const files = Array.from(fileList).slice(0, MAX_IMAGES);
-      const results = [];
-      previewsEl.innerHTML = "";
-      
-      if (files.length > 0) { previewsEl.dataset.show = "true"; } 
-      else { previewsEl.dataset.show = "false"; }
-
-      for (const f of files) {
-        if (!f.type.startsWith("image/")) continue;
-        const dataUrl = await compressImage(f);
-        
-        const wrap = document.createElement("div");
-        wrap.className = "pe-thumb";
-        wrap.innerHTML = `<img src="${dataUrl}">`;
-        previewsEl.appendChild(wrap);
-
-        results.push({
-          name: f.name.replace(/\.[^.]+$/, ".jpg"),
-          mime: "image/jpeg",
-          dataUrl: dataUrl
-        });
-      }
-      return results;
     }
 
     imgEl.addEventListener("change", async () => {
@@ -262,7 +264,15 @@
       const emailVal = emailEl.value.trim();
       const textVal = textEl.value.trim();
       
-      if(!emailVal || !textVal) { return; }
+      // Check if email format is invalid or empty
+      if (!emailVal || !isValidEmail(emailVal)) {
+        emailEl.classList.add("pe-error");
+        emailError.classList.add("pe-show");
+        emailEl.focus();
+        return;
+      }
+
+      if (!textVal) { return; }
 
       submitBtn.disabled = true;
       submitBtn.innerText = "Lähetetään...";
@@ -270,7 +280,6 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // HİÇBİR ZAMAN HATA VERMEYEN EN SADE FETCH METODU
         await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
@@ -292,7 +301,6 @@
         formContainer.style.display = "none";
         successContainer.style.display = "block";
         
-        // 10 SANİYE SONRA ANA SAYFAYA YÖNLENDİRME KODU
         setTimeout(() => {
           window.location.href = "https://www.inkyvibestattoo.com";
         }, 10000);

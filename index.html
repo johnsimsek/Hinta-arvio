@@ -10,51 +10,26 @@
       --font-main: 'Montserrat', sans-serif;
       --bg-glass: rgba(255, 255, 255, 0.85);
       --border-glass: rgba(255, 255, 255, 0.5);
-      --z: 2147483000;
     }
     body { margin: 0; font-family: var(--font-main); background: transparent; box-sizing: border-box; }
     * { box-sizing: inherit; }
-    .pe-hidden { display: none !important; }
 
-    .pe-ctaCenter {
-      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      z-index: var(--z); display: flex; align-items: center; justify-content: flex-start;
-      gap: 12px; padding: 10px 20px 10px 10px; border-radius: 50px;
-      border: 1px solid rgba(0, 0, 0, 0.1); background: var(--bg-glass);
-      backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); cursor: pointer;
-      user-select: none; max-width: calc(100vw - 40px); transition: transform 0.2s, box-shadow 0.2s;
+    /* Embedded Form Container Layout */
+    .pe-wrapper {
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto;
+      background: var(--bg-glass);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
     }
-    .pe-ctaCenter:active { transform: translate(-50%, -50%) scale(0.97); }
-    .pe-iconWrap {
-      width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%;
-      display: grid; place-items: center; background: #000000; color: #ffffff; font-size: 20px;
-    }
-    .pe-ctaText { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
-    .pe-ctaTitle { font-weight: 600; font-size: 14px; color: #000; }
-    .pe-ctaSub { font-weight: 400; font-size: 12px; color: #666; margin-top: 2px; }
 
-    .pe-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-      z-index: calc(var(--z) + 1); display: flex; align-items: center; justify-content: center;
-      opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-    .pe-overlay[data-open="true"] { opacity: 1; visibility: visible; }
-
-    .pe-panel {
-      position: relative; width: 90%; max-width: 450px; background: var(--bg-glass);
-      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      border: 1px solid var(--border-glass); border-radius: 20px;
-      overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-      max-height: 90vh; display: flex; flex-direction: column;
-    }
-    .pe-close {
-      position: absolute; top: 15px; right: 15px; font-size: 24px; font-weight: 600;
-      color: #000; background: rgba(255, 255, 255, 0.9); width: 35px; height: 35px;
-      border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 10; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
     .pe-header { padding: 30px 30px 10px; text-align: center; }
     .pe-header h3 { margin: 0; font-weight: 600; font-size: 20px; color: #000; }
     .pe-header p { margin: 8px 0 0 0; font-size: 13px; color: #444; line-height: 1.5; }
@@ -98,56 +73,46 @@
     .pe-successCard { display: none; text-align: center; padding: 30px; }
     .pe-successCard h4 { font-size: 18px; margin: 0 0 10px 0; color: #000; }
     .pe-successCard p { font-size: 14px; color: #444; line-height: 1.5; margin: 0; }
-    .pe-successCard .pe-iconWrap { margin: 0 auto 15px auto; background: #059669; }
+    .pe-successCard .pe-iconWrap {
+      width: 44px; height: 44px; margin: 0 auto 15px auto; border-radius: 50%;
+      display: grid; place-items: center; background: #059669; color: #ffffff; font-size: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <button class="pe-ctaCenter" id="peCta" type="button">
-    <span class="pe-iconWrap">💭</span>
-    <span class="pe-ctaText">
-      <span class="pe-ctaTitle">Tatuoinnin Hinta-arvio</span>
-      <span class="pe-ctaSub">Pyydä ilmainen arvio</span>
-    </span>
-  </button>
+  <div class="pe-wrapper">
+    <div id="formContainer">
+      <div class="pe-header">
+        <h3>Tatuoinnin Hinta-arvio</h3>
+        <p>Kerro ideastasi, toivotusta koosta ja sijainnista. Voit ladata myös referenssikuvia.</p>
+      </div>
 
-  <div class="pe-overlay" id="peOverlay" data-open="false">
-    <div class="pe-panel">
-      <button class="pe-close" id="peClose">&times;</button>
-      
-      <div id="formContainer">
-        <div class="pe-header">
-          <h3>Pyydä Hinta-arvio</h3>
-          <p>Kerro ideastasi, toivotusta koosta ja sijainnista. Voit ladata myös referenssikuvia.</p>
+      <form class="pe-body" id="peForm" novalidate>
+        <div class="pe-input-group">
+          <input type="email" id="peEmail" class="pe-input" placeholder="Sähköpostiosoite *" required />
+          <span class="pe-error-msg" id="peEmailError">Kirjoita kelvollinen sähköpostiosoite (esim. nimi@osoite.fi)</span>
         </div>
 
-        <form class="pe-body" id="peForm" novalidate>
-          <div class="pe-input-group">
-            <input type="email" id="peEmail" class="pe-input" placeholder="Sähköpostiosoite *" required />
-            <span class="pe-error-msg" id="peEmailError">Kirjoita kelvollinen sähköpostiosoite (esim. nimi@osoite.fi)</span>
-          </div>
+        <div class="pe-input-group">
+          <textarea id="peText" class="pe-textarea" placeholder="Kuvaile tatuointia (esim. koko, sijainti, tyyli)... *" required></textarea>
+        </div>
+        
+        <div class="pe-file-wrapper">
+          <span>+ Lisää referenssikuvia (Valinnainen)</span>
+          <input class="pe-file" id="peImages" type="file" accept="image/*" multiple />
+        </div>
+        <div class="pe-previews" id="pePreviews"></div>
 
-          <div class="pe-input-group">
-            <textarea id="peText" class="pe-textarea" placeholder="Kuvaile tatuointia (esim. koko, sijainti, tyyli)... *" required></textarea>
-          </div>
-          
-          <div class="pe-file-wrapper">
-            <span>+ Lisää referenssikuvia (Valinnainen)</span>
-            <input class="pe-file" id="peImages" type="file" accept="image/*" multiple />
-          </div>
-          <div class="pe-previews" id="pePreviews"></div>
+        <button type="submit" class="pe-btn" id="peSubmit">Lähetä Pyyntö</button>
+      </form>
+    </div>
 
-          <button type="submit" class="pe-btn" id="peSubmit">Lähetä Pyyntö</button>
-        </form>
-      </div>
-
-      <div class="pe-successCard" id="successContainer">
-        <div class="pe-iconWrap">✓</div>
-        <h4>Pyyntö Lähetetty!</h4>
-        <p>Kiitos viestistäsi. Saat pian sähköpostia, jossa on tatuointisi hinta-arvio!</p>
-        <p style="font-size: 11px; color: #888; margin-top: 10px;">Sinut ohjataan etusivulle...</p>
-        <button class="pe-btn" style="margin-top: 25px;" id="peCloseSuccess">Sulje</button>
-      </div>
+    <div class="pe-successCard" id="successContainer">
+      <div class="pe-iconWrap">✓</div>
+      <h4>Pyyntö Lähetetty!</h4>
+      <p>Kiitos viestistäsi. Saat pian sähköpostia, jossa on tatuointisi hinta-arvio!</p>
+      <p style="font-size: 11px; color: #888; margin-top: 10px;">Sinut ohjataan etusivulle...</p>
     </div>
   </div>
 
@@ -158,10 +123,6 @@
     const MAX_DIM = 1800; 
     const JPEG_QUALITY = 0.90; 
 
-    const cta = document.getElementById("peCta");
-    const overlay = document.getElementById("peOverlay");
-    const closeBtn = document.getElementById("peClose");
-    const closeSuccessBtn = document.getElementById("peCloseSuccess");
     const form = document.getElementById("peForm");
     const emailEl = document.getElementById("peEmail");
     const emailError = document.getElementById("peEmailError");
@@ -171,28 +132,6 @@
     const submitBtn = document.getElementById("peSubmit");
     const formContainer = document.getElementById("formContainer");
     const successContainer = document.getElementById("successContainer");
-
-    cta.addEventListener("click", () => {
-      overlay.dataset.open = "true";
-      cta.classList.add("pe-hidden");
-    });
-
-    function closePanel() {
-      overlay.dataset.open = "false";
-      cta.classList.remove("pe-hidden");
-      setTimeout(() => {
-        formContainer.style.display = "block";
-        successContainer.style.display = "none";
-        form.reset();
-        previewsEl.innerHTML = "";
-        previewsEl.dataset.show = "false";
-        emailEl.classList.remove("pe-error");
-        emailError.classList.remove("pe-show");
-      }, 400);
-    }
-    
-    closeBtn.addEventListener("click", closePanel);
-    closeSuccessBtn.addEventListener("click", closePanel);
 
     // Email validation helper function
     function isValidEmail(email) {
@@ -234,6 +173,32 @@
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, w, h);
       return canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+    }
+
+    async function processFiles(fileList) {
+      const files = Array.from(fileList).slice(0, MAX_IMAGES);
+      const results = [];
+      previewsEl.innerHTML = "";
+      
+      if (files.length > 0) { previewsEl.dataset.show = "true"; } 
+      else { previewsEl.dataset.show = "false"; }
+
+      for (const f of files) {
+        if (!f.type.startsWith("image/")) continue;
+        const dataUrl = await compressImage(f);
+        
+        const wrap = document.createElement("div");
+        wrap.className = "pe-thumb";
+        wrap.innerHTML = `<img src="${dataUrl}">`;
+        previewsEl.appendChild(wrap);
+
+        results.push({
+          name: f.name.replace(/\.[^.]+$/, ".jpg"),
+          mime: "image/jpeg",
+          dataUrl: dataUrl
+        });
+      }
+      return results;
     }
 
     imgEl.addEventListener("change", async () => {

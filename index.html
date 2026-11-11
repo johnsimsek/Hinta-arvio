@@ -26,7 +26,6 @@
       user-select: none; max-width: calc(100vw - 40px); transition: transform 0.2s, box-shadow 0.2s;
     }
     .pe-ctaCenter:active { transform: translate(-50%, -50%) scale(0.97); }
-
     .pe-iconWrap {
       width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%;
       display: grid; place-items: center; background: #000000; color: #ffffff; font-size: 20px;
@@ -141,7 +140,7 @@
   </div>
 
   <script>
-    // 👇👇 BURAYA YENİ ALDIĞIN URL'Yİ YAPIŞTIR: 👇👇
+    // URL BURADA:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
 
     const MAX_IMAGES = 5;
@@ -274,26 +273,31 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // Google'ın ASLA engelleyemediği FormData formatı
-        const formData = new FormData();
-        formData.append("email", emailVal);
-        formData.append("text", textVal);
-        formData.append("images", JSON.stringify(processedImages));
-
-        // json() okuma kodu silindi, çünkü no-cors kullanıyoruz
-        await fetch(SCRIPT_URL, {
+        // CORS ENGELİNİ AŞAN METOT BURASI
+        const response = await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
-          body: formData
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8" 
+          },
+          body: JSON.stringify({
+            email: emailVal,
+            text: textVal,
+            images: processedImages
+          })
         });
 
-        // Hata fırlatılmazsa (Google çökmezse) başarılı ekranını göster
-        formContainer.style.display = "none";
-        successContainer.style.display = "block";
+        const result = await response.json();
+        
+        if (result.ok) {
+          formContainer.style.display = "none";
+          successContainer.style.display = "block";
+        } else {
+          alert("Lähetys epäonnistui: " + result.error);
+        }
         
       } catch (err) {
         console.error(err);
-        alert("Yhteysvirhe oluştu.");
+        alert("Bağlantı koptu. Hata: " + err.message);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";

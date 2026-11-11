@@ -17,27 +17,27 @@
     /* Embedded Form Container Layout */
     .pe-wrapper {
       width: 100%;
-      max-width: 450px;
-      margin: 0 auto;
+      max-width: 480px;
+      margin: 20px auto;
       background: var(--bg-glass);
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
       border: 1px solid var(--border-glass);
-      border-radius: 20px;
+      border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
       display: flex;
       flex-direction: column;
     }
 
-    .pe-header { padding: 30px 30px 10px; text-align: center; }
-    .pe-header h3 { margin: 0; font-weight: 600; font-size: 20px; color: #000; }
-    .pe-header p { margin: 8px 0 0 0; font-size: 13px; color: #444; line-height: 1.5; }
-    .pe-body { padding: 15px 30px 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+    .pe-header { padding: 35px 35px 15px; text-align: center; }
+    .pe-header h3 { margin: 0; font-weight: 600; font-size: 22px; color: #000; }
+    .pe-header p { margin: 10px 0 0 0; font-size: 14px; color: #444; line-height: 1.6; }
+    .pe-body { padding: 15px 35px 35px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
-    .pe-input-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
+    .pe-input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .pe-input, .pe-textarea {
-      width: 100%; padding: 14px 20px; border: 1px solid rgba(0, 0, 0, 0.1);
+      width: 100%; padding: 15px 20px; border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 20px; background: rgba(255, 255, 255, 0.6);
       font-family: var(--font-main); font-size: 14px; outline: none; transition: border 0.3s;
     }
@@ -46,11 +46,12 @@
     .pe-error-msg { font-size: 12px; color: #dc2626; padding-left: 15px; display: none; }
     .pe-error-msg.pe-show { display: block; }
 
-    .pe-textarea { min-height: 100px; resize: vertical; border-radius: 16px; }
+    /* Increased textarea height for a taller, better-proportioned look */
+    .pe-textarea { min-height: 140px; resize: vertical; border-radius: 18px; }
 
     .pe-file-wrapper {
-      position: relative; border: 1px dashed rgba(0, 0, 0, 0.3); border-radius: 16px;
-      background: rgba(255, 255, 255, 0.5); padding: 15px; text-align: center;
+      position: relative; border: 1px dashed rgba(0, 0, 0, 0.3); border-radius: 18px;
+      background: rgba(255, 255, 255, 0.5); padding: 18px; text-align: center;
       cursor: pointer; transition: 0.3s;
     }
     .pe-file-wrapper:hover { background: rgba(255, 255, 255, 0.8); }
@@ -59,23 +60,23 @@
 
     .pe-previews { display: none; gap: 10px; flex-wrap: wrap; margin-top: -5px; }
     .pe-previews[data-show="true"] { display: flex; }
-    .pe-thumb { width: 60px; height: 60px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); }
+    .pe-thumb { width: 65px; height: 65px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); }
     .pe-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
     .pe-btn {
-      width: 100%; padding: 14px 20px; border: none; border-radius: 50px;
+      width: 100%; padding: 16px 20px; border: none; border-radius: 50px;
       background: #000000; color: #ffffff; font-family: var(--font-main);
       font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: transform 0.2s, background 0.3s;
     }
     .pe-btn:active { transform: scale(0.98); }
     .pe-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .pe-successCard { display: none; text-align: center; padding: 30px; }
-    .pe-successCard h4 { font-size: 18px; margin: 0 0 10px 0; color: #000; }
+    .pe-successCard { display: none; text-align: center; padding: 40px 30px; }
+    .pe-successCard h4 { font-size: 20px; margin: 0 0 10px 0; color: #000; }
     .pe-successCard p { font-size: 14px; color: #444; line-height: 1.5; margin: 0; }
     .pe-successCard .pe-iconWrap {
-      width: 44px; height: 44px; margin: 0 auto 15px auto; border-radius: 50%;
-      display: grid; place-items: center; background: #059669; color: #ffffff; font-size: 20px;
+      width: 50px; height: 50px; margin: 0 auto 15px auto; border-radius: 50%;
+      display: grid; place-items: center; background: #059669; color: #ffffff; font-size: 22px;
     }
   </style>
 </head>
@@ -112,7 +113,7 @@
       <div class="pe-iconWrap">✓</div>
       <h4>Pyyntö Lähetetty!</h4>
       <p>Kiitos viestistäsi. Saat pian sähköpostia, jossa on tatuointisi hinta-arvio!</p>
-      <p style="font-size: 11px; color: #888; margin-top: 10px;">Sinut ohjataan etusivulle...</p>
+      <p style="font-size: 11px; color: #888; margin-top: 12px;">Sinut ohjataan etusivulle...</p>
     </div>
   </div>
 

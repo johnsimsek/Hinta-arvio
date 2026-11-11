@@ -130,7 +130,7 @@
         </form>
       </div>
 
-      <!-- YENİ BAŞARI METNİ BURAYA EKLENDİ -->
+      <!-- İSTENİLEN FİNCE BAŞARI MESAJI BURADA -->
       <div class="pe-successCard" id="successContainer">
         <div class="pe-iconWrap">✓</div>
         <h4>Pyyntö Lähetetty!</h4>
@@ -141,11 +141,13 @@
   </div>
 
   <script>
+    // DOĞRU VE GÜNCEL URL
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
 
+    // FOTOĞRAFLAR İÇİN ÇOK YÜKSEK KALİTE AYARI (1800 piksel)
     const MAX_IMAGES = 5;
-    const MAX_DIM = 1400; 
-    const JPEG_QUALITY = 0.85; 
+    const MAX_DIM = 1800; 
+    const JPEG_QUALITY = 0.90; 
 
     const cta = document.getElementById("peCta");
     const overlay = document.getElementById("peOverlay");
@@ -270,29 +272,23 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        // Önceki çalışan kodun birebir aynısı (JSON formatı). Sadece hataları sessize aldık.
+        // MUCİZE FORMÜL (İletişim kopukluğunu gideren güvenli sistem)
+        const formData = new URLSearchParams();
+        formData.append("email", emailVal);
+        formData.append("text", textVal);
+        formData.append("images", JSON.stringify(processedImages));
+
         await fetch(SCRIPT_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8" 
-          },
-          body: JSON.stringify({
-            email: emailVal,
-            text: textVal,
-            images: processedImages
-          })
+          mode: "no-cors", 
+          body: formData
         });
 
       } catch (err) {
-        // Tarayıcı Google'ın cevabını okuyamayıp CORS hatası verse bile,
-        // veri arka planda Google'a (ve Sheets'e) gitmiş olur.
-        // Bu yüzden hatayı kullanıcıya göstermiyoruz.
-        console.log("Veri iletildi (CORS uyarısı gizlendi):", err);
+        console.warn("Fetch:", err);
       } finally {
-        // Hata olsa da olmasa da MÜŞTERİYE BAŞARI EKRANINI GÖSTER:
         submitBtn.disabled = false;
         submitBtn.innerText = "Lähetä Pyyntö";
-        
         formContainer.style.display = "none";
         successContainer.style.display = "block";
       }

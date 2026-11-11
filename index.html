@@ -140,13 +140,12 @@
   </div>
 
   <script>
-    // URL AYNEN KORUNDU
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCQXLQ3OVzfgIOUu6NKdVi4OXtJ6nVtEQcn4a0lrEysaAP_36tf4Jy__urPTQSMud0XQ/exec";
 
-    // MÜŞTERİ FOTOĞRAFLARI İÇİN MAKSİMUM KALİTE AYARLARI
     const MAX_IMAGES = 5;
-    const MAX_DIM = 2000; // Çok yüksek çözünürlük
-    const JPEG_QUALITY = 0.92; // Çok yüksek kalite (Orijinale çok yakın)
+    // ALTIN ORAN: Google'ı çökertmeyen ama çok kaliteli gösteren ayarlar
+    const MAX_DIM = 1400; 
+    const JPEG_QUALITY = 0.85; 
 
     const cta = document.getElementById("peCta");
     const overlay = document.getElementById("peOverlay");
@@ -239,7 +238,7 @@
       if (imgEl.files.length > MAX_IMAGES) {
         alert("Voit ladata enintään " + MAX_IMAGES + " kuvaa.");
       }
-      previewsEl.innerHTML = "<div style='font-size:12px;'>Ladataan esikatseluita...</div>";
+      previewsEl.innerHTML = "<div style='font-size:12px;'>Ladataan...</div>";
       previewsEl.dataset.show = "true";
       
       const files = Array.from(imgEl.files).slice(0, MAX_IMAGES);
@@ -271,15 +270,15 @@
       try {
         const processedImages = await processFiles(imgEl.files);
         
-        const formData = new URLSearchParams();
-        formData.append("email", emailVal);
-        formData.append("text", textVal);
-        formData.append("images", JSON.stringify(processedImages));
-
         await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors", 
-          body: formData
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            email: emailVal,
+            text: textVal,
+            images: processedImages
+          })
         });
 
       } catch (err) {

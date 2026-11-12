@@ -92,6 +92,7 @@
       <form class="pe-body" id="peForm" novalidate>
         <div class="pe-input-group">
           <input type="tel" id="pePhone" class="pe-input" value="+358 " placeholder="Puhelinnumero *" required />
+          <span class="pe-error-msg" id="pePhoneError">Kirjoita kelvollinen puhelinnumero</span>
         </div>
 
         <div class="pe-input-group">
@@ -130,6 +131,7 @@
 
     const form = document.getElementById("peForm");
     const phoneEl = document.getElementById("pePhone");
+    const phoneError = document.getElementById("pePhoneError");
     const emailEl = document.getElementById("peEmail");
     const emailError = document.getElementById("peEmailError");
     const textEl = document.getElementById("peText");
@@ -143,6 +145,10 @@
     phoneEl.addEventListener("input", (e) => {
       if (!phoneEl.value.startsWith("+358")) {
         phoneEl.value = "+358 ";
+      }
+      if (phoneEl.classList.contains("pe-error")) {
+        phoneEl.classList.remove("pe-error");
+        phoneError.classList.remove("pe-show");
       }
     });
 
@@ -243,6 +249,14 @@
       const emailVal = emailEl.value.trim();
       const textVal = textEl.value.trim();
       
+      // Check if phone number is only prefix or empty
+      if (!phoneVal || phoneVal === "+358" || phoneVal === "+358 ") {
+        phoneEl.classList.add("pe-error");
+        phoneError.classList.add("pe-show");
+        phoneEl.focus();
+        return;
+      }
+
       // Check if email format is invalid or empty
       if (!emailVal || !isValidEmail(emailVal)) {
         emailEl.classList.add("pe-error");
@@ -251,7 +265,7 @@
         return;
       }
 
-      if (!phoneVal || !textVal) { return; }
+      if (!textVal) { return; }
 
       submitBtn.disabled = true;
       submitBtn.innerText = "Lähetetään...";

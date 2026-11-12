@@ -44,7 +44,7 @@
     }
     .pe-floating-input {
       width: 100%;
-      padding: 22px 20px 10px 20px; /* Üst kısımda etiket için boşluk bırakıldı */
+      padding: 22px 20px 10px 20px;
       border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.6);
@@ -56,13 +56,13 @@
     .pe-floating-input:focus { border-color: rgba(0, 0, 0, 0.4); }
     .pe-floating-input.pe-error { border-color: #dc2626; background: rgba(220, 38, 38, 0.05); }
 
-    /* İşaretlediğin sol üst köşedeki etiket stili */
+    /* Sähköpostiosoite placeholder rengiyle birebir aynı gri tonu */
     .pe-floating-label {
       position: absolute;
       left: 20px;
       top: 16px;
       font-size: 14px;
-      color: #777;
+      color: #757575;
       pointer-events: none;
       transition: all 0.2s ease;
     }
@@ -72,8 +72,8 @@
     .pe-floating-input:not(:placeholder-shown) ~ .pe-floating-label {
       top: 7px;
       font-size: 10px;
-      color: #444;
-      font-weight: 600;
+      color: #757575;
+      font-weight: 500;
     }
 
     .pe-input, .pe-textarea {
@@ -129,7 +129,7 @@
       </div>
 
       <form class="pe-body" id="peForm" novalidate>
-        <!-- Sol üst köşede etiket ve içinde +358 olan telefon alanı -->
+        <!-- Telefon alanı (Sol üst köşede gri etiketli ve +358 ön ekli) -->
         <div class="pe-input-group">
           <div class="pe-floating-group">
             <input type="tel" id="pePhone" class="pe-floating-input" value="+358 " placeholder=" " required />

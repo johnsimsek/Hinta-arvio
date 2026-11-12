@@ -36,6 +36,46 @@
     .pe-body { padding: 15px 35px 35px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
     .pe-input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+    
+    /* Floating Label Input Container */
+    .pe-floating-group {
+      position: relative;
+      width: 100%;
+    }
+    .pe-floating-input {
+      width: 100%;
+      padding: 22px 20px 10px 20px; /* Üst kısımda etiket için boşluk bırakıldı */
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-main);
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    .pe-floating-input:focus { border-color: rgba(0, 0, 0, 0.4); }
+    .pe-floating-input.pe-error { border-color: #dc2626; background: rgba(220, 38, 38, 0.05); }
+
+    /* İşaretlediğin sol üst köşedeki etiket stili */
+    .pe-floating-label {
+      position: absolute;
+      left: 20px;
+      top: 16px;
+      font-size: 14px;
+      color: #777;
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    /* Input odaklandığında veya dolu olduğunda etiketin yukarı kayması */
+    .pe-floating-input:focus ~ .pe-floating-label,
+    .pe-floating-input:not(:placeholder-shown) ~ .pe-floating-label {
+      top: 7px;
+      font-size: 10px;
+      color: #444;
+      font-weight: 600;
+    }
+
     .pe-input, .pe-textarea {
       width: 100%; padding: 15px 20px; border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 20px; background: rgba(255, 255, 255, 0.6);
@@ -46,7 +86,6 @@
     .pe-error-msg { font-size: 12px; color: #dc2626; padding-left: 15px; display: none; }
     .pe-error-msg.pe-show { display: block; }
 
-    /* Increased textarea height for a taller, better-proportioned look */
     .pe-textarea { min-height: 140px; resize: vertical; border-radius: 18px; }
 
     .pe-file-wrapper {
@@ -90,8 +129,12 @@
       </div>
 
       <form class="pe-body" id="peForm" novalidate>
+        <!-- Sol üst köşede etiket ve içinde +358 olan telefon alanı -->
         <div class="pe-input-group">
-          <input type="tel" id="pePhone" class="pe-input" value="+358 *" required />
+          <div class="pe-floating-group">
+            <input type="tel" id="pePhone" class="pe-floating-input" value="+358 " placeholder=" " required />
+            <label class="pe-floating-label" for="pePhone">Puhelinnumero *</label>
+          </div>
           <span class="pe-error-msg" id="pePhoneError">Kirjoita kelvollinen puhelinnumero</span>
         </div>
 
@@ -141,10 +184,10 @@
     const formContainer = document.getElementById("formContainer");
     const successContainer = document.getElementById("successContainer");
 
-    // Ensure +358 * prefix cannot be accidentally deleted completely
+    // Ensure +358 prefix cannot be accidentally deleted completely
     phoneEl.addEventListener("input", (e) => {
       if (!phoneEl.value.startsWith("+358")) {
-        phoneEl.value = "+358 *";
+        phoneEl.value = "+358 ";
       }
       if (phoneEl.classList.contains("pe-error")) {
         phoneEl.classList.remove("pe-error");
@@ -250,7 +293,7 @@
       const textVal = textEl.value.trim();
       
       // Check if phone number is only prefix or empty
-      if (!phoneVal || phoneVal === "+358" || phoneVal === "+358 *" || phoneVal === "+358*") {
+      if (!phoneVal || phoneVal === "+358" || phoneVal === "+358 ") {
         phoneEl.classList.add("pe-error");
         phoneError.classList.add("pe-show");
         phoneEl.focus();
